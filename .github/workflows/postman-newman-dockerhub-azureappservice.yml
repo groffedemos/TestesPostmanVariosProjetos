@@ -29,4 +29,5 @@ jobs:
 
     - name: Geração de tag com número do Build e Push no Docker Hub
       run: |
-        docker push --all-tags ${{ env.IMAGEM_DOCKERHUB }}      
+        docker tag ${{ env.IMAGEM_DOCKERHUB }}:latest ${{ env.IMAGEM_DOCKERHUB }}:$GITHUB_RUN_NUMBER
+        docker push --all-tags ${{ env.IMAGEM_DOCKERHUB }}
