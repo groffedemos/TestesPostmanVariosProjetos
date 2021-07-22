@@ -8,6 +8,7 @@ on:
 
 env:
   IMAGEM_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME }}/testes-apifinancas-classlib-dotnet5
+  NOME_WEBAPP: groffefinancas0
   
 jobs:
 
@@ -31,3 +32,20 @@ jobs:
       run: |
         docker tag ${{ env.IMAGEM_DOCKERHUB }}:latest ${{ env.IMAGEM_DOCKERHUB }}:$GITHUB_RUN_NUMBER
         docker push --all-tags ${{ env.IMAGEM_DOCKERHUB }}
+
+  deployment-azwebapp:
+    needs: [build-tests-push]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Azure Login - Conectando com Credenciais no Azure
+      uses: Azure/login@v1.1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure WebApp - Deployment da Aplicacao
+      uses: Azure/webapps-deploy@v2.2.3
+      with:
+        app-name: ${{ env.NOME_WEBAPP }}
+        images: '${{ env.IMAGEM_DOCKERHUB }}:${{ github.run_number }}'
